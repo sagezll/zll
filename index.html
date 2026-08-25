@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b9a5e3">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>蕾蕾的地盘</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg1:#f6f1fc; --bg2:#faf8fe;
+  --card:#ffffff;
+  --purple:#a98fdc; --purple-deep:#8467c3; --purple-text:#5b4a8a;
+  --lav:#ece4f9; --lav2:#e0d4f5;
+  --line:#e6ddf5;
+  --text:#4a4160; --text2:#8d82a6;
+  --ok:#4caf7d; --warn:#e07856;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%);
+  color:var(--text);font-size:15px;line-height:1.6;
+}
+#app{display:grid;grid-template-columns:212px 1fr;min-height:100vh;max-width:1180px;margin:0 auto}
+
+/* ---------- 侧边栏 ---------- */
+#sidebar{padding:18px 14px;display:flex;flex-direction:column;gap:10px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 4px 12px}
+.brand-icon{width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,#ded0f7,#b9a5e3);color:#fff;font-size:22px;font-weight:700;
+  box-shadow:0 4px 10px rgba(148,120,208,.35)}
+.brand-name{font-size:17px;font-weight:700;color:var(--purple-text)}
+.brand-sub{font-size:11px;color:var(--text2)}
+.task-btn{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;border:1px solid transparent;border-radius:14px;
+  background:var(--card);cursor:pointer;font-size:15px;color:var(--text);transition:.18s;
+  box-shadow:0 2px 6px rgba(140,110,200,.08)}
+.task-btn:hover{border-color:var(--lav2)}
+.task-btn.active{background:linear-gradient(135deg,#efe7fc,#e3d7f7);border-color:var(--lav2);color:var(--purple-text);font-weight:600;
+  box-shadow:0 4px 12px rgba(148,120,208,.22)}
+.task-btn .ico{font-size:19px}
+.task-btn .tick{margin-left:auto;width:22px;height:22px;border-radius:50%;flex:none;background:var(--lav);display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent}
+.task-btn.done .tick{background:var(--ok);color:#fff}
+.task-btn.done .tick::after{content:"✓"}
+.side-stats{margin-top:auto;background:var(--card);border-radius:var(--radius);padding:12px 14px;box-shadow:0 2px 6px rgba(140,110,200,.08)}
+.side-stats .row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.side-stats .row b{color:var(--purple-text)}
+.btn-install{margin-top:8px;width:100%;padding:9px;border:none;border-radius:10px;background:var(--lav);color:var(--purple-text);font-size:13px;cursor:pointer}
+.btn-install:hover{background:var(--lav2)}
+
+/* ---------- 主区 ---------- */
+main{padding:16px 18px 40px;display:flex;flex-direction:column;gap:14px;min-width:0}
+
+/* 小猫区 */
+#catArea{background:linear-gradient(135deg,#efe8fb 0%,#f8f4fe 55%,#efe4f8 100%);border:1px solid var(--line);
+  border-radius:20px;padding:14px 18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden}
+#catArea::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%, rgba(255,255,255,.8), transparent 45%);pointer-events:none}
+#catScene{width:240px;height:180px;flex:none;position:relative}
+#catScene svg{width:100%;height:100%}
+.cat-info{flex:1;min-width:220px;position:relative}
+.cat-name{font-size:18px;font-weight:700;color:var(--purple-text)}
+.cat-stage{font-size:13px;color:var(--text2);margin-bottom:6px}
+.growth-bar{height:9px;border-radius:6px;background:#fff;border:1px solid var(--line);overflow:hidden;max-width:320px}
+.growth-bar i{display:block;height:100%;background:linear-gradient(90deg,#c3a8ec,#9c7bd8);border-radius:6px;transition:width .5s}
+.cat-stats{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 8px;font-size:13px}
+.cat-stats span{background:rgba(255,255,255,.75);border:1px solid var(--line);padding:3px 10px;border-radius:20px}
+.cat-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:none;border-radius:12px;padding:9px 16px;font-size:14px;cursor:pointer;transition:.18s;font-family:inherit}
+.btn-feed{background:linear-gradient(135deg,#c3a8ec,#9c7bd8);color:#fff;box-shadow:0 4px 10px rgba(148,120,208,.3)}
+.btn-feed:disabled{background:#d8d2e3;color:#fff;box-shadow:none;cursor:not-allowed}
+.btn-shop{background:#fff;border:1px solid var(--lav2);color:var(--purple-text)}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--text2)}
+.dead-mask{position:absolute;inset:0;background:rgba(250,248,254,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:10px;z-index:2}
+.dead-mask h4{color:#7a6f96;font-size:15px}
+.dead-mask p{font-size:12.5px;color:var(--text2);max-width:340px}
+
+/* 任务区 */
+#taskArea{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px;box-shadow:0 4px 14px rgba(140,110,200,.07);min-height:420px}
+#taskHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px dashed var(--line);margin-bottom:14px}
+#taskHead h2{font-size:18px;color:var(--purple-text)}
+.status-chip{padding:3px 12px;border-radius:20px;font-size:12.5px;background:var(--lav);color:var(--text2)}
+.status-chip.done{background:#e2f4ea;color:var(--ok);font-weight:600}
+.duration-set{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2)}
+.duration-set input{width:56px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;text-align:center;font-size:14px;color:var(--text);font-family:inherit}
+.timer-box{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:14px;flex-wrap:wrap}
+.timer-big{font-size:26px;font-weight:700;color:var(--purple-text);font-variant-numeric:tabular-nums;min-width:150px}
+.timer-total{font-size:13px;color:var(--text2)}
+.timer-progress{flex:1;min-width:130px;height:8px;border-radius:6px;background:var(--lav);overflow:hidden}
+.timer-progress i{display:block;height:100%;background:linear-gradient(90deg,#c3a8ec,#9c7bd8);transition:width .4s}
+
+/* 通用面板元素 */
+.sec-title{font-size:15px;font-weight:600;color:var(--purple-text);margin:4px 0 10px}
+.mode-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.mode-tab{padding:7px 16px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13.5px;color:var(--text2)}
+.mode-tab.active{background:linear-gradient(135deg,#c3a8ec,#9c7bd8);color:#fff;border-color:transparent}
+.hint{font-size:12.5px;color:var(--text2);margin-top:10px;line-height:1.7}
+.done-banner{display:flex;align-items:center;gap:10px;background:#e9f7ef;border:1px solid #bfe6cf;color:#2e7d54;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:600;margin-bottom:14px}
+
+/* 单词卡 */
+.word-card{max-width:520px;margin:0 auto;background:linear-gradient(150deg,#f3ecfc,#fff);border:1px solid var(--lav2);border-radius:20px;padding:28px 22px;text-align:center;box-shadow:0 6px 18px rgba(148,120,208,.12)}
+.word-en{font-size:34px;font-weight:700;color:var(--purple-text);letter-spacing:.5px}
+.word-ph{font-size:15px;color:var(--text2);margin:6px 0 10px}
+.word-cn{font-size:19px}
+.word-idx{font-size:12.5px;color:var(--text2);margin-bottom:14px}
+.word-acts{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.btn-word{padding:10px 26px;border-radius:24px;border:none;background:linear-gradient(135deg,#c3a8ec,#9c7bd8);color:#fff;font-size:15px;cursor:pointer;box-shadow:0 4px 10px rgba(148,120,208,.3)}
+.btn-listen{width:42px;height:42px;border-radius:50%;border:1px solid var(--lav2);background:#fff;font-size:17px;cursor:pointer}
+.level-pick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+
+/* 瑜伽姿势 */
+.yoga-wrap{display:flex;gap:18px;flex-wrap:wrap}
+.yoga-stage{flex:1;min-width:260px;background:linear-gradient(160deg,#f1eafd,#fff);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+.yoga-stage svg{width:210px;height:210px}
+.pose-name{font-size:17px;font-weight:700;color:var(--purple-text)}
+.pose-sub{font-size:12px;color:var(--text2)}
+.pose-dots{display:flex;gap:5px;justify-content:center;margin-top:10px}
+.pose-dots i{width:8px;height:8px;border-radius:50%;background:var(--lav2)}
+.pose-dots i.on{background:var(--purple-deep)}
+.url-row{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.url-row input{flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit;color:var(--text)}
+.embed-box{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;min-height:200px}
+.embed-box iframe{width:100%;height:240px;border:none;display:block}
+.embed-box video{width:100%;display:block}
+
+/* 读书/钢琴/禅绕 */
+.mode-card{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.book-meta{font-size:13px;color:var(--text2)}
+.btn-primary{background:linear-gradient(135deg,#c3a8ec,#9c7bd8);color:#fff;border:none;box-shadow:0 4px 10px rgba(148,120,208,.3)}
+.btn-primary:disabled{background:#d8d2e3;box-shadow:none;cursor:not-allowed}
+.upload-zone{border:2px dashed var(--lav2);border-radius:16px;padding:26px;text-align:center;color:var(--text2);cursor:pointer;transition:.2s;background:#fbfaff}
+.upload-zone:hover{border-color:var(--purple);background:var(--lav)}
+.photo-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.photo-grid img{width:110px;height:110px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.week-badge{display:inline-flex;gap:6px;align-items:center;background:var(--lav);border-radius:20px;padding:5px 14px;font-size:13px;color:var(--purple-text);margin-bottom:12px}
+.score-lines{font-family:KaiTi,STKaiti,serif;font-size:16px;line-height:2.1;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px 18px;max-width:430px}
+.score-lines b{color:var(--purple-deep)}
+.note-nums{color:var(--purple-deep);letter-spacing:2px}
+.metro-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.metro-row input[type=range]{accent-color:var(--purple-deep)}
+
+/* 阅读器覆盖层 */
+#readerOverlay{position:fixed;inset:0;background:#f8f5fd;z-index:60;display:none;flex-direction:column}
+#readerOverlay.open{display:flex}
+.reader-top{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.reader-top .t{font-weight:600;color:var(--purple-text);flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reader-timer{font-size:14px;color:var(--purple-text);font-variant-numeric:tabular-nums}
+#readerBody{flex:1;overflow-y:auto;padding:24px 18px;max-width:760px;margin:0 auto;width:100%}
+#readerBody .content{font-size:18px;line-height:2;white-space:pre-wrap;word-break:break-word}
+
+/* 商店 */
+#shopModal{position:fixed;inset:0;background:rgba(74,65,96,.35);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+#shopModal.open{display:flex}
+.shop-box{background:#fff;border-radius:20px;max-width:640px;width:100%;max-height:86vh;overflow-y:auto;padding:20px 22px}
+.shop-head{display:flex;align-items:center;margin-bottom:14px}
+.shop-head h3{color:var(--purple-text);font-size:18px;flex:1}
+.shop-close{border:none;background:var(--lav);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--purple-text)}
+.shop-item{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.shop-item .ic{font-size:30px;width:48px;height:48px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:12px}
+.shop-item .nm{flex:1;min-width:130px}
+.shop-item .nm b{display:block;font-size:15px}
+.shop-item .nm span{font-size:12px;color:var(--text2)}
+.quality-row{display:flex;gap:8px;flex-wrap:wrap}
+.q-chip{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:78px}
+.q-chip .q-dot{width:14px;height:14px;border-radius:50%}
+.q-chip .q-nm{font-size:12px}
+.q-chip .q-pr{font-size:12.5px;color:var(--purple-text);font-weight:700}
+.q-chip .q-btn{border:none;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;background:linear-gradient(135deg,#c3a8ec,#9c7bd8);color:#fff}
+.q-chip .q-btn:disabled{background:#e4e0ee;color:#aaa;cursor:not-allowed}
+.q-chip.owned{border-color:var(--ok);background:#f0faf4}
+.q-chip.owned .q-btn{background:#e2f4ea;color:var(--ok);cursor:default}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%) translateY(20px);background:rgba(84,68,128,.92);color:#fff;
+  padding:11px 22px;border-radius:24px;font-size:14px;z-index:99;opacity:0;pointer-events:none;transition:.3s;max-width:86vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.warn{background:rgba(206,100,70,.94)}
+
+/* ---------- 移动端 ---------- */
+@media (max-width:760px){
+  #app{grid-template-columns:1fr}
+  #sidebar{position:static;height:auto;padding:12px 12px 4px;gap:8px}
+  .brand{padding:2px 4px 8px}
+  #taskNav{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .task-btn{flex:none;padding:9px 12px;border-radius:12px;font-size:14px}
+  .side-stats{display:none}
+  main{padding:10px 12px 30px;gap:10px}
+  #catArea{padding:12px 14px}
+  #catScene{width:170px;height:130px}
+  #taskArea{padding:14px}
+  .timer-big{font-size:22px}
+  .word-en{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">蕾</div>
+      <div>
+        <div class="brand-name">蕾蕾的地盘</div>
+        <div class="brand-sub">养猫打卡 · 自律小窝</div>
+      </div>
+    </div>
+    <nav id="taskNav">
+      <button class="task-btn active" data-task="reading"><span class="ico">📖</span>读书<span class="tick"></span></button>
+      <button class="task-btn" data-task="english"><span class="ico">🔤</span>英语<span class="tick"></span></button>
+      <button class="task-btn" data-task="yoga"><span class="ico">🧘</span>瑜伽<span class="tick"></span></button>
+      <button class="task-btn" data-task="piano"><span class="ico">🎹</span>钢琴<span class="tick"></span></button>
+      <button class="task-btn" data-task="zentangle"><span class="ico">🎨</span>禅绕<span class="tick"></span></button>
+    </nav>
+    <div class="side-stats">
+      <div class="row"><span>积分</span><b id="sidePoints">0</b></div>
+      <div class="row"><span>猫条</span><b id="sideTreats">0</b></div>
+      <div class="row"><span>今日完成</span><b id="sideCount">0/5</b></div>
+      <button class="btn-install" id="btnInstall" style="display:none">📲 安装到手机桌面</button>
+    </div>
+  </aside>
+
+  <main>
+    <section id="catArea">
+      <div id="catScene"></div>
+      <div class="cat-info">
+        <div class="cat-name">团子 🐾 <span id="catStageName" style="font-size:12px;font-weight:400;color:var(--text2)"></span></div>
+        <div class="cat-stage" id="catGrowthText"></div>
+        <div class="growth-bar"><i id="growthBar" style="width:0%"></i></div>
+        <div class="cat-stats">
+          <span>💰 积分 <b id="catPoints">0</b></span>
+          <span>🍖 猫条 <b id="catTreats">0</b></span>
+          <span id="catStreak"></span>
+        </div>
+        <div class="cat-actions">
+          <button class="btn btn-feed" id="btnFeed">喂猫条</button>
+          <button class="btn btn-shop" id="btnShop">🛍️ 猫咪商店</button>
+        </div>
+      </div>
+      <div class="dead-mask" id="deadMask" style="display:none">
+        <h4>😿 团子饿晕过去了…</h4>
+        <p>连续三天没有完成任务，团子去了喵星。<br>从今天起<b>连续两天完成三项任务</b>，就能把它救回来（会变回刚出生的样子重新养哦）。</p>
+      </div>
+    </section>
+
+    <section id="taskArea">
+      <div id="taskHead">
+        <h2 id="taskTitle">读书</h2>
+        <span class="status-chip" id="taskStatus">未完成</span>
+        <div class="duration-set" id="durationSet">
+          <span>时长目标</span>
+          <input type="number" id="durationInput" min="1" max="600" step="1"><span>分钟</span>
+        </div>
+      </div>
+      <div id="panel"></div>
+    </section>
+  </main>
+</div>
+
+<!-- 阅读器 -->
+<div id="readerOverlay">
+  <div class="reader-top">
+    <span class="t" id="readerTitle">书名</span>
+    <span class="reader-timer" id="readerTimer">00:00</span>
+    <button class="btn btn-ghost" id="readerFontMinus" style="padding:5px 12px">A-</button>
+    <button class="btn btn-ghost" id="readerFontPlus" style="padding:5px 12px">A+</button>
+    <button class="btn btn-primary" id="readerClose" style="padding:6px 16px">读完合上书</button>
+  </div>
+  <div id="readerBody"><div class="content" id="readerContent"></div></div>
+</div>
+
+<!-- 商店 -->
+<div id="shopModal">
+  <div class="shop-box">
+    <div class="shop-head">
+      <h3>🛍️ 猫咪商店 <span style="font-size:13px;font-weight:400;color:var(--text2)">积分余额：<b id="shopPoints">0</b></span></h3>
+      <button class="shop-close" id="shopClose">✕</button>
+    </div>
+    <div id="shopList"></div>
+    <p class="hint">品质越高，猫窝里的物件越精致好看～ 拥有后自动为团子装备最高品质的一件。</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+<!-- 电子书解析库 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+<script src="words.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
